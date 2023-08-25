@@ -1,0 +1,75 @@
+---
+title: "eds221-comp10"
+format: html
+editor: visual
+---
+
+## 
+
+```{r}
+library(tidyverse)
+library(here)
+library(janitor)
+```
+
+```{r}
+madison_ice <- read_csv(here("data", "ntl33_v7.csv"))
+madison_meteor <- read_csv(here("data", "ntl20_v6.csv"))
+```
+
+Create a visualization that compares ice duration across
+different lakes in the Madison Lake Area. Include both the actual ice
+duration values *and* some representation of summary statistics
+for each lake. Careful if you use a boxplot over a jitter or beeswarm -
+what values might be doubly represented? Can you find an argument that
+would help you remove those from the boxplot?
+
+```{r}
+madison_ice %>% 
+  drop_na(ice_duration) %>% 
+ggplot(aes(x = lakeid, y = ice_duration)) +
+  geom_jitter() 
+```
+
+Find the mean ice cover duration in Madison Lake Area by year
+(i.e., you\'ll only be grouping by the year variable here). Understanding
+check: what are you finding the mean of here? Why are there multiple
+observations for each year?)
+
+```{r}
+mean_ice <- madison_ice %>% 
+  group_by(year4) %>% 
+  summarise(mean_by_year = mean(iceon, na.rm = TRUE))
+```
+
+Create an exploratory visualization of mean ice cover duration by
+year for the Madison Lake Area. Add a sentence or two below this
+exploratory graph describing the overall trend(s) you observe.
+
+```{r}
+mean_ice %>% 
+  drop_na(year4, mean_by_year) %>% 
+ggplot(aes(x = year4, y = mean_by_year)) +
+  geom_jitter()
+```
+
+Find the mean air temperature (using the daily average air
+temperature - adjusted) in Madison Lake Area **by year**
+using **only observations from winter months (December, January,
+February)**
+
+```{r}
+mean_airtemp <- madison_meteor %>% 
+  group_by(year4) %>% 
+  filter(month %in% c(12, 1, 2)) %>% 
+  summarise(mean_airadj = mean(ave_air_temp_adjusted, na.rm = "TRUE"))
+```
+
+Create an exploratory visualization of mean winter temperatures
+for the Madison Lake Area. Add a sentence or two below this exploratory
+graph describing the overall trend(s) you observe.
+
+```{r}
+ggplot(data = mean_airtemp, aes(x = month, y = "mean_airadj")) +
+  geom_jitter()
+```
